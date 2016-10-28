@@ -17,39 +17,45 @@ import org.junit.Test;
  *
  */
 public class Solution {
+	class Node {
+		int value;
+		Node next;
+		
+		public Node(int value) {
+			this.value = value;
+		}
+	}
 
 	public void rotate(int[] nums, int k) {
-		if (k > nums.length) {
+		if (nums.length <= 1 || k == 0) {
 			return;
 		}
 		
-		int[] tempArray = new int[k];
-		// Move k elements to temporary storage
-		for (int i=nums.length-k; i<nums.length; i++) {
-			tempArray[i-nums.length+k] = nums[i];
+		// Create a single circular linked list to connect all elements in the given array
+		Node pre = new Node(nums[0]);
+		Node first = pre;
+		for (int i=1; i<nums.length; i++) {
+			Node node = new Node(nums[i]);
+			pre.next = node;
+			pre = node;
 		}
+		pre.next = first;
 		
-		// Shift first nums.length - k elements
-		for (int i=nums.length-1; i>=k; i--) {
-			nums[i] = nums[i-k];
+		// Find out the new head element
+		// pre points to last element right now
+		int step = nums.length - k % nums.length;
+		while (step > 0 ) {
+			pre = first;
+			first = first.next;
+			step--;
 		}
+		pre.next = null;
 		
-		// Move the k elements back to nums
-		for (int i=0; i<k; i++) {
-			nums[i] = tempArray[i];
+		int i = 0;
+		for (Node cur = first; cur != null; cur = cur.next) {
+			nums[i] = cur.value;
+			i++;
 		}
-	}
-	
-	/**
-	 * Shift nums[index] to nums[0]
-	 */
-	public void moveElementToFirst(int[] nums, int index) {
-		int temp = nums[index];
-		for (int i=index; i>0; i--) {
-			nums[i] = nums[i-1];
-		}
-		
-		nums[0] = temp;
 	}
 
 	@Test
@@ -73,6 +79,26 @@ public class Solution {
 		assertEquals(3, nums[4]);
 		assertEquals(4, nums[5]);
 		assertEquals(5, nums[6]);
+		
+		int[] nums2 = {1, 2, 3, 4, 5, 6, 7};
+		solution.rotate(nums2, 7);
+		assertEquals(1, nums2[0]);
+		assertEquals(2, nums2[1]);
+		assertEquals(3, nums2[2]);
+		assertEquals(4, nums2[3]);
+		assertEquals(5, nums2[4]);
+		assertEquals(6, nums2[5]);
+		assertEquals(7, nums2[6]);
+		
+		int[] nums3 = {1, 2, 3, 4, 5, 6, 7};
+		solution.rotate(nums3, 9);
+		assertEquals(6, nums3[0]);
+		assertEquals(7, nums3[1]);
+		assertEquals(1, nums3[2]);
+		assertEquals(2, nums3[3]);
+		assertEquals(3, nums3[4]);
+		assertEquals(4, nums3[5]);
+		assertEquals(5, nums3[6]);
 	}
 
 }
