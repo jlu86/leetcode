@@ -12,78 +12,114 @@ import org.junit.Test;
  * 
  * @author jielu
  *
+ * Note: 1. how to represent a negative value with two's complement representation
+ *       2. Math.abs(Integer.MIN_VALUE) = Integer.MIN_VALUE, need to convert to long first
  */
 public class Solution {
-	public int getSum(int a, int b) {
-		// Check the sign for the result
-		int absA = Math.abs(a);
-		int absB = Math.abs(b);
-		boolean negative = false;
-		if (a < 0 && b < 0) {
-			negative = true;
-		} else {
-			negative = absA > absB ? a <0 : b < 0;
+	// Assume the system is with 32 bits
+	static int bitSize = 32;
+	
+	/**
+	 * Get the two's complement representation of a integer, describe it as an array
+	 */
+	public int[] getBitArray(int a) {
+		int[] array = new int[bitSize];
+		boolean negative = a < 0;
+
+		long temp = Math.abs((long)a);
+		int i = bitSize - 1;
+		while (temp != 0) {
+			array[i] = (int) temp % 2;
+			temp = temp / 2;
+			i--;
 		}
-		
-		// Whether add or subtract
-		boolean add = true;
-		if (a * b < 0) {
-			add = false;
+
+		if (negative) {
+			// Get a two's complement representation of a negative
+			// Step 1: get the two's complement representation of the absolute
+			// value
+			// Step 2: flip each bit
+			for (int j = 0; j < bitSize; j++) {
+				array[j] = flip(array[j]);
+			}
+			// Step 3: add 1 to the flipped value
+			int[] oneArray = new int[64];
+			oneArray[bitSize - 1] = 1;
+			return addTwoBitArray(array, oneArray);
 		}
-		
-		// Convert the two integers to bit array
-		int length1 = absA/2 + 1;
-		int length2 = absB/2 + 1;
-		int maxLength = Math.max(length1, length2) + 1;
-		// Let the two array be with the same length to simplify the computation later
-		int[] array1 = getBitArray(Math.max(absA, absB), maxLength);
-		int[] array2 = getBitArray(Math.min(absA, absB), maxLength);
-		
-		// Add two numbers by operating the two bit arrays
-		int[] result = new int[maxLength];
-		int k = maxLength - 1;
+
+		return array;
+	}
+	
+	/**
+	 * Flip the element 
+	 */
+	public int flip(int num) {
+		return num == 1 ? 0 : 1;
+	}
+
+	/**
+	 * Compute the sum of two bit array, do not count for negative or not right now
+	 */
+	public int[] addTwoBitArray(int[] array1, int[] array2) {
+		int[] result = new int[bitSize];
+		int k = bitSize - 1;
 		int next = 0;
 		while (k >= 0) {
 			result[k] = array1[k] ^ array2[k] ^ next;
-			// If the method is add, and if two of the array1[i], array2[j], next are 1, we need to add 1 to previous bit
-			if (add && (((array1[k] & array2[k]) == 1
-					|| (array1[k] & next) == 1
-					|| (array2[k] & next) == 1))) {
-				next = 1;
-			} else if (!add
-					&& ((next == 0 && array1[k] < array2[k])
-					|| (next != 0 && array2[k] != 0))) {
-				// if the method is minus
+			if ((array1[k] & array2[k]) == 1 || (array1[k] & next) == 1 || (array2[k] & next) == 1) {
 				next = 1;
 			} else {
 				next = 0;
 			}
 			k--;
 		}
-		
-		// Convert the result bit array back to integer
-		int factor = 1;
-		int sum = 0;
-		for (int i=0; i<maxLength; i++) {
-			sum += result[maxLength-1-i] * factor;
-			factor *= 2;
-		}
-		
-		return negative ? -sum : sum;
+
+		return result;
 	}
 
-	public int[] getBitArray(int a, int arrayLength) {
-		int[] array = new int[arrayLength];
-		int temp = a;
-		int index = arrayLength - 1;
-		while (temp != 0) {
-			array[index] = temp % 2;
-			temp = temp / 2;
-			index--;
+	/**
+	 * Get the number representation of given bit array, sign bit needs to be considered.
+	 */
+	public int getNumFromBitArray(int[] array) {
+		if (array[0] == 1) {
+			// negative value
+			// flip each bit of the two's complement representation of the
+			// negative value
+			for (int i = 0; i < array.length; i++) {
+				array[i] = flip(array[i]);
+			}
+
+			// add 1 to the flipped value
+			int[] oneArray = new int[bitSize];
+			oneArray[bitSize - 1] = 1;
+			return -getAbsValueFromBitArray(addTwoBitArray(array, oneArray));
 		}
-		
-		return array;
+
+		return getAbsValueFromBitArray(array);
 	}
+
+	/**
+	 * Get the absolute number representation of given array. The array always represent a positive value.
+	 */
+	public int getAbsValueFromBitArray(int[] array) {
+		int sum = 0;
+		int factor = 1;
+		for (int i = array.length - 1; i >= 0; i--) {
+			sum += array[i] * factor;
+			factor *= 2;
+		}
+
+		return sum;
+	}
+
+	public int getSum(int a, int b) {
+		int[] array1 = getBitArray(a);
+		int[] array2 = getBitArray(b);
+		int[] result = addTwoBitArray(array1, array2);
+		return getNumFromBitArray(result);
+	}
+
 	@Test
 	public void test() {
 		Solution solution = new Solution();
