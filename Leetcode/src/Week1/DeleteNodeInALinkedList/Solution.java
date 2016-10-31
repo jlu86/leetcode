@@ -36,7 +36,7 @@ public class Solution {
 		
 		ListNode toReplace = node;
 		ListNode current = node.next;
-		while (current != null) {
+		while (true) {
 			toReplace.val = current.val;
 			if (current.next == null) {
 				toReplace.next = null;
