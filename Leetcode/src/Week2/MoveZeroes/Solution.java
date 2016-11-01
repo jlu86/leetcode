@@ -1,4 +1,4 @@
-package Week2.MoveZerios;
+package Week2.MoveZeroes;
 
 import static org.junit.Assert.*;
 
