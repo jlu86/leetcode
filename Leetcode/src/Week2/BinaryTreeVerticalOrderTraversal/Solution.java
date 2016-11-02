@@ -87,6 +87,14 @@ public class Solution {
 		int leftMostWidth;
 		int rightMostWidth;
 	}
+	
+	public class ResultNode {
+		List<Integer> nodes;
+		
+		public ResultNode() {
+			nodes = new ArrayList<Integer>();
+		}
+ 	}
 
 	public List<List<Integer>> verticalOrder(TreeNode root) {
 		List<List<Integer>> list = new ArrayList<>();
@@ -104,10 +112,10 @@ public class Solution {
 		int columns = width.leftMostWidth + width.rightMostWidth + 1;
 
 		// Construct the result matrix and fill the value from the given tree
-		TreeNode[][] result = new TreeNode[rows][columns];
+		ResultNode[][] result = new ResultNode[rows][columns];
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < columns; j++) {
-				result[i][j] = null;
+				result[i][j] = new ResultNode();
 			}
 		}
 		fillResultMatrix(result, root, 0, width.leftMostWidth);
@@ -116,16 +124,8 @@ public class Solution {
 		for (int j = 0; j < columns; j++) {
 			List<Integer> column = new ArrayList<>();
 			for (int i = 0; i < rows; i++) {
-				TreeNode node = result[i][j];
-				if (node != null) {
-					if (node.left != null && node.right != null) {
-						// two nodes share the same row and column
-						column.add(node.left.val);
-						column.add(node.right.val);
-					} else {
-						column.add(node.val);
-					}
-				}
+				ResultNode node = result[i][j];
+				column.addAll(node.nodes);
 			}
 
 			list.add(column);
@@ -138,23 +138,13 @@ public class Solution {
 	 * Fill the value of node to result[row][column] and fill the child tree
 	 * recursively
 	 */
-	public void fillResultMatrix(TreeNode[][] result, TreeNode node, int row, int column) {
+	public void fillResultMatrix(ResultNode[][] result, TreeNode node, int row, int column) {
 		if (node == null) {
 			return;
 		}
 
-		TreeNode newTreeNode = null;
-		// TreeNode newTreeNode = new TreeNode(node.val);
-		if (result[row][column] != null) {
-			// already filled left child before
-			newTreeNode = new TreeNode(Integer.MIN_VALUE);
-			newTreeNode.left = new TreeNode(result[row][column].val);
-			newTreeNode.right = node;
-		} else {
-			newTreeNode = new TreeNode(node.val);
-		}
-
-		result[row][column] = newTreeNode;
+		ResultNode newTreeNode = result[row][column];
+		newTreeNode.nodes.add(node.val);
 
 		fillResultMatrix(result, node.left, row+1, column-1);
 		fillResultMatrix(result, node.right, row+1, column+1);
