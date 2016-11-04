@@ -28,9 +28,15 @@ public class Solution extends VersionControl {
             	// first bad version should be <= mid
             	curFirst = Math.min(curFirst, mid);
             	end = mid - 1;
+            	if (end <= n && !isBadVersion(end)) {
+            		return curFirst;
+            	}
             } else {
             	// first bad version should be > mid
             	start = mid + 1;
+            	if (start >0 && isBadVersion(start)) {
+            		return start;
+            	}
             }
         }
         
