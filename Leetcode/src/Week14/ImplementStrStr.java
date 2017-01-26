@@ -12,6 +12,10 @@ public class Solution {
         for (; haystackIdx < haystack.length(); haystackIdx++) {
             int i = haystackIdx;
             int j = 0;
+            if (needle.length() > haystack.length() - i) {
+                // the next substring in haystack is shorter than needle
+                return -1;
+            }
             while (i < haystack.length() && j < needle.length() && haystack.charAt(i) == needle.charAt(j)) {
                 i++;
                 j++;
