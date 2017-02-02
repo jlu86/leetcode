@@ -8,7 +8,7 @@
  * }
  */
 public class Solution {
-    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+   public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
         // The last node removed from the stack
         TreeNode pop = new TreeNode(-1);
         // The parent node of the last node removed from the stack, i.e. the diverge node
@@ -36,18 +36,21 @@ public class Solution {
                     met = pushAndUpdate(stack, peek.right, p, q, met);
                 } else {
                     // The peek node is a left node, pop from the stack
-                    parent = popAndUpdate(stack, p, q, pop, parent);
+                	pop = stack.pop();
+                	parent = updatePopParent(stack, p, q, pop, parent);
                 }
             } else if (pop == peek.left) {
                 // The left path has already been visited, try the right path
                 if (peek.right != null) {
                     met = pushAndUpdate(stack, peek.right, p, q, met);
                 } else {
-                  parent = popAndUpdate(stack, p, q, pop, parent);
+                	pop = stack.pop();
+                	parent = updatePopParent(stack, p, q, pop, parent);
                 }
             } else {
                 // Both left and right paths have been visited, pop the peek from the stack
-                parent = popAndUpdate(stack, p, q, pop, parent);
+            	pop = stack.pop();
+            	parent = updatePopParent(stack, p, q, pop, parent);
             }
             
             if (met == 2) {
@@ -76,9 +79,8 @@ public class Solution {
     }
     
     // ????? why parent node can't be updated in the method
-    public TreeNode popAndUpdate(Stack<TreeNode> stack, TreeNode p, TreeNode q, TreeNode pop, TreeNode parent) {
-        pop = stack.pop();
-        if (pop == p || pop == q || pop == parent) {
+    public TreeNode updatePopParent(Stack<TreeNode> stack, TreeNode p, TreeNode q, TreeNode pop, TreeNode parent) {
+    	if (pop == p || pop == q || pop == parent) {
             // Backtrack the furthest node in the path of first matched node
             return stack.peek();
         }
