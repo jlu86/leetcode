@@ -17,17 +17,7 @@ public class Solution {
         
         // Sort the list of intervals first
         Interval temp = new Interval();
-        
-        for (int i = 0; i < intervals.size()-1; i++) {
-            for (int j = i+1; j < intervals.size(); j++) {
-                Interval left = intervals.get(i);
-                Interval right = intervals.get(j);
-                if (right.start < left.start) {
-                    intervals.set(i, right);
-                    intervals.set(j, left);
-                }
-            }
-        }
+        sort(intervals);
         
         // Merge the sorted list of intervals
         temp = intervals.get(0);
@@ -46,5 +36,48 @@ public class Solution {
         result.add(temp);
         
         return result;
+    }
+    
+    public void sort(List<Interval> intervals) {
+         
+        if (intervals == null || intervals.size() == 0) {
+            return;
+        }
+        
+        quickSort(intervals, 0, intervals.size() - 1);
+    }
+ 
+    private void quickSort(List<Interval> intervals, int lowerIndex, int higherIndex) {
+         
+        int i = lowerIndex;
+        int j = higherIndex;
+        // calculate pivot number
+        Interval pivot = intervals.get(lowerIndex+(higherIndex-lowerIndex)/2);
+        // Divide into two arrays
+        while (i <= j) {
+            while (intervals.get(i).start < pivot.start) {
+                i++;
+            }
+            while (intervals.get(j).start > pivot.start) {
+                j--;
+            }
+            if (i <= j) {
+                exchangeIntervals(intervals, i, j);
+                //move index to next position on both sides
+                i++;
+                j--;
+            }
+        }
+        // call quickSort() method recursively
+        if (lowerIndex < j)
+            quickSort(intervals, lowerIndex, j);
+        if (i < higherIndex)
+            quickSort(intervals, i, higherIndex);
+    }
+ 
+    private void exchangeIntervals(List<Interval> intervals, int i, int j) {
+        Interval temp = intervals.get(i);
+        intervals.set(i, intervals.get(j));
+        intervals.set(j, temp);
     }
 }
