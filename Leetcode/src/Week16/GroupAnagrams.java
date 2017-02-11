@@ -37,7 +37,10 @@ public class Solution {
     
     private String toKey(int[] array) {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < array.length && array[i] != 0; i++) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == 0) {
+                continue;
+            }
             char c = (char)('a' + i);
             builder.append(c).append(array[i]);
         }
