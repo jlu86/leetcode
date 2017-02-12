@@ -1,21 +1,40 @@
 public class Solution {
     public int combinationSum4(int[] nums, int target) {
-        if (target == 0) {
+        if (nums.length == 0) {
             return 0;
         }
-        return combinationSum4(nums, 0, target);
-    }
-    
-    public int combinationSum4(int[] nums, int start, int target) {
-        if (start >= nums.length) {
-            return target == 0 ? 1 : 0;
+        
+        // sort the nums in ascending order
+        for (int i = 0; i < nums.length - 1; i++) {
+            for (int j = i + 1; j < nums.length; j++) {
+                if (nums[j] < nums[i]) {
+                    int temp = nums[j];
+                    nums[j] = nums[i];
+                    nums[i] = temp;
+                }
+            }
         }
         
-        int num = nums[start];
-        int possibilities = target / num;
+        if (nums[0] > target) {
+            // the smallest number is still large than target, no combination could be found
+            return 0;
+        }
+        
+        return internalCombinationSum4(nums, target);
+    }
+    
+    public int internalCombinationSum4(int[] nums, int target) {
+        if (nums[0] > target) {
+            return 0;
+        }
+        
         int total = 0;
-        for (int i = 0; i <= possibilities; i++) {
-            total += combinationSum4(nums, start+1, target - num*i);
+        for (int i = 0; i < nums.length && nums[i] <= target; i++) {
+            if (target - nums[i] == 0) {
+                total++;
+            } else {
+                total += combinationSum4(nums, target - nums[i]);
+            }
         }
         
         return total;
