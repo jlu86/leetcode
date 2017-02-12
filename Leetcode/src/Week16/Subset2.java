@@ -33,7 +33,8 @@ public class Solution {
         for (int i = 0; i < subResult.size(); i++) {
             // update each subset
             for (int j = 0; j <= occurence; j++) {
-                List<Integer> subset = subResult.get(i);
+                // v1: List<Integer> subset = subResult.get(i); refers to the same list for all occurences, thus unexpected result
+                List<Integer> subset = new ArrayList<>(subResult.get(i));
                 // update each combination of 'num'
                 for (int k = 0; k < j; k++) {
                     subset.add(num);
