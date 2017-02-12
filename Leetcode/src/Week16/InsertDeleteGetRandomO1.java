@@ -1,12 +1,12 @@
 public class RandomizedSet {
     HashMap<Integer, Integer> valueToIndex;
-    List<Integer> values;
+    HashMap<Integer, Integer> indexToValue;
     Random random;
 
     /** Initialize your data structure here. */
     public RandomizedSet() {
         valueToIndex = new HashMap<>();
-        values = new ArrayList<>();
+        indexToValue = new HashMap<>();
         random = new Random();
     }
     
@@ -14,8 +14,9 @@ public class RandomizedSet {
     public boolean insert(int val) {
         Integer index = valueToIndex.get(val);
         if (index == null) {
-            values.add(val);
-            valueToIndex.put(val, values.size() - 1);
+            int size = valueToIndex.size();
+            valueToIndex.put(val, size);
+            indexToValue.put(size, val);
         }
         
         return index == null;
@@ -23,22 +24,35 @@ public class RandomizedSet {
     
     /** Removes a value from the set. Returns true if the set contained the specified element. */
     public boolean remove(int val) {
-        Integer index = valueToIndex.get(val);
-        if (index != null) {
-            valueToIndex.remove(val);
-            values.set(index, null);
+        int size = valueToIndex.size();
+        if (!valueToIndex.containsKey(val)) {
+            return false;
         }
         
-        return index != null;
+        if (size == 1) {
+            valueToIndex.remove(val);
+            indexToValue.remove(0);
+            return true;
+        }
+        
+        Integer index = valueToIndex.get(val);
+        valueToIndex.remove(val);
+        
+        // Swap the last element with the element to delete, then delete the last element
+        Integer toSwap = indexToValue.get(size-1);
+        indexToValue.put(index, toSwap);
+        indexToValue.remove(size-1);
+        // Update the index for the swapped element
+        valueToIndex.put(toSwap, index);
+            
+        return true;
     }
     
     /** Get a random element from the set. */
     public int getRandom() {
-        int randomIndex = random.nextInt(values.size());
-        while (values.get(randomIndex) == null) {
-            randomIndex = random.nextInt(values.size());
-        }
-        return values.get(randomIndex);
+        // map valueToIndex is the source of truth
+        int randomIndex = random.nextInt(valueToIndex.size());
+        return indexToValue.get(randomIndex);
     }
 }
 
