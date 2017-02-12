@@ -29,13 +29,15 @@ public class RandomizedSet {
             return false;
         }
         
-        if (size == 1) {
+        Integer index = valueToIndex.get(val);
+        if (index == size - 1) {
+            // remove the last element directly if matched
             valueToIndex.remove(val);
-            indexToValue.remove(0);
+            indexToValue.remove(index);
             return true;
         }
         
-        Integer index = valueToIndex.get(val);
+ 
         valueToIndex.remove(val);
         
         // Swap the last element with the element to delete, then delete the last element
