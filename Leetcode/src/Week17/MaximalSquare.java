@@ -17,7 +17,7 @@ public class Solution {
                         }
                     }
                     
-                    if (k < delta) {
+                    if (k <= delta) {
                         // if current square reaching to matrix[i][j+delta] doesn't meet, continue to next element
                         break;
                     }
