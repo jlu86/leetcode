@@ -18,7 +18,7 @@ public class Solution {
             if (citations[i] < current) {
                 break;
             }
-            if (i-1 >= 0 && citations[i-1] <= current) {
+            if ((i-1 < 0) || (i-1 >= 0 && citations[i-1] <= current)) {
                 max = current > max ? current : max;
             }
         }
