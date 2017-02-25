@@ -1,26 +1,26 @@
 public class Solution {
     public int findMaxLength(int[] nums) {
         int max = 0;
-        int num0 = 0;
-        int num1 = 0;
         
-        for (int i = 0; i < nums.length-1; i++) {
-            for (int j = i; j < nums.length; j++) {
-                if (nums[j] == 0) {
-                    num0++;
-                }
-                
-                if (nums[j] == 1) {
-                    num1++;
-                }
-                
-                if (num0 == num1) {
-                    max = Math.max(max, j - i + 1);
-                }
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == 0) {
+                nums[i] = -1;
             }
+        }
+        
+        // (sum, index of first occurrence)
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int sum = 0;
+        for (int i = 0; i < nums.length; i++) {
+            sum += nums[i];
             
-            num0 = 0;
-            num1 = 0;
+            if (sum == 0) {
+                max = Math.max(max, i+1);
+            } else if (map.containsKey(sum)) {
+                max = Math.max(max, i - map.get(sum));
+            } else {
+                map.put(sum, i);
+            }
         }
         
         return max;
