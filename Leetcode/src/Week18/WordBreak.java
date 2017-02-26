@@ -1,43 +1,52 @@
 public class Solution {
-    // substring (i-end), can break to words or not
-    HashMap<Integer, Boolean> breakResult = new HashMap<>();
-    int maxWordLength = 0;
-    
     public boolean wordBreak(String s, List<String> wordDict) {
+        if (wordDict.isEmpty()) {
+            return false;
+        }
+        
+        int maxWordLength = 0;
+    
         // Hashset of the dictionary
         HashSet<String> dict = new HashSet<>();
-        
         for (int i = 0; i < wordDict.size(); i++) {
             String word = wordDict.get(i);
             if (word.length() > maxWordLength) {
-                maxWordLength = word.length;
+                maxWordLength = word.length();
             }
             dict.add(word);
         }
         
-        return wordBreak(s, 0, dict);  
-    }
-    
-    // return whether the substring (startIdx, s.length()-1) can break to words
-    public boolean wordBreak(String s, int startIdx, HashSet<String> dict) {
-        boolean canBreak = false;
-        StringBuilder sb = new StringBuilder();
-        for (int length = 0; length < maxWordLength && startIdx + length < s.length(); length++) {
-            int curIdx = startIdx + length;
-            sb.append(s.charAt(curIdx));
-            if (dict.contains(sb.toString()) {
-                // compute the result starting from curIdx+1
-                if (curIdx == s.length()+1) {
-                    canBreak = true;
-                } else if (breakResult.containsKey(curIdx+1)) {
-                    canBreak = breakResult.get(curIdx+1);
-                } else {
-                    canBreak = wordBreak(s, curIdx+1, dict);
+        // Save the result for last maxWordLength elements
+        boolean[] temp = new boolean[maxWordLength];
+        for (int i = s.length()-1; i >= 0; i--) {
+            boolean found = false;
+            StringBuilder sb = new StringBuilder();
+            for (int length = 0; length < maxWordLength && i + length < s.length(); length++) {
+                sb.append(s.charAt(i+length));
+                
+                if (dict.contains(sb.toString())) {
+                    if (i+length+1 == s.length()) {
+                        found = true;
+                    } else {
+                        found = temp[length];
+                    }
+                }
+                
+                if (found) {
+                   break;
                 }
             }
+            
+            shiftTempResult(temp, found);
         }
-        breakResult.put(startIdx, canBreak);
         
-        return canBreak;
+        return temp[0]; 
+    }
+    
+    public void shiftTempResult(boolean[] temp, boolean currentResult) {
+        for (int i = temp.length-1; i > 0; i--) {
+            temp[i] = temp[i-1];
+        }
+        temp[0] = currentResult;
     }
 }
